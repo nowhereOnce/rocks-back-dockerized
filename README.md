@@ -21,7 +21,7 @@ Una API REST moderna y asincrónica para gestionar un registro completo de muest
 
 ---
 
-## ✨ Características
+## Características
 
 - **CRUD Completo** para Rocas, Ubicaciones y Muestras
 - **Arquitectura Asincrónica** con FastAPI y SQLModel async
@@ -39,7 +39,7 @@ Una API REST moderna y asincrónica para gestionar un registro completo de muest
 
 ---
 
-## 🏗️ Arquitectura del Sistema
+## Arquitectura del Sistema
 
 ```plaintext
 ┌─────────────────────────────────────────────────┐
@@ -89,7 +89,7 @@ JSON Response → NGINX → Cliente
 
 ---
 
-## 🔧 Requisitos Previos
+## Requisitos Previos
 
 - **Docker** ≥ 20.10
 - **Docker Compose** ≥ 1.29
@@ -99,7 +99,7 @@ JSON Response → NGINX → Cliente
 
 ---
 
-## 🚀 Instalación y Configuración
+## Instalación y Configuración
 
 ### 1. Clonar el repositorio
 
@@ -204,7 +204,7 @@ Abre en tu navegador:
 
 ---
 
-## 💻 Uso de la API
+## Uso de la API
 
 ### Opción 1: Swagger UI (Recomendado)
 
@@ -240,7 +240,7 @@ curl -X POST http://localhost/api/rocks \
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```plaintext
 rocks-back-dockerized/
@@ -297,7 +297,7 @@ Schemas (Validación & Response)
 
 ---
 
-## 📡 Endpoints Disponibles
+## Endpoints Disponibles
 
 ### 🪨 Rocks (Rocas)
 
@@ -331,7 +331,7 @@ Schemas (Validación & Response)
 
 ---
 
-## 🔍 Ejemplos de Requests
+## Ejemplos de Requests
 
 ### ✅ Crear una Roca
 
@@ -478,7 +478,7 @@ curl -X DELETE http://localhost/api/rocks/550e8400-e29b-41d4-a716-446655440000
 
 ---
 
-## 🔄 Desarrollo Local
+## Desarrollo Local
 
 ### Ejecutar en Desarrollo con Python Local
 
@@ -535,7 +535,7 @@ docker-compose up --build
 
 ---
 
-## ⚙️ Notas Técnicas
+## Notas Técnicas
 
 ### 🔄 Auto-creación de Entidades (Get-or-Create)
 
@@ -637,7 +637,7 @@ async def lifespan(app: FastAPI):
 
 ---
 
-## 📊 Monitoreo
+## Monitoreo
 
 ### Ver Estado de Contenedores
 
@@ -718,7 +718,7 @@ curl http://localhost -w "\nStatus: %{http_code}\n"
 docker-compose exec postgres pg_isready -U rocks_user -d rocks_db
 ```
 
-## 🛠️ Stack Tecnológico Detallado
+## Stack Tecnológico Detallado
 
 | Componente | Tecnología | Versión | Propósito |
 | ----------- | ----------- | --------- | ---------- |
@@ -733,7 +733,7 @@ docker-compose exec postgres pg_isready -U rocks_user -d rocks_db
 
 ---
 
-## 📚 Documentación Adicional
+## Documentación Adicional
 
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)
 - [SQLModel Documentation](https://sqlmodel.tiangolo.com/)
@@ -744,19 +744,13 @@ docker-compose exec postgres pg_isready -U rocks_user -d rocks_db
 
 ---
 
-## 👨‍💻 Autor
+##  Autor
 
 **Aguilar Ramos Enrique Alejandro** | Backend Development • Python • FastAPI • APIs REST • DevOps
 
 ---
 
-## 📄 Licencia
-
-Este proyecto está bajo la licencia MIT. Ver `LICENSE` para más detalles.
-
----
-
-## ✅ Checklist de Arranque Rápido
+## Checklist de Arranque Rápido
 
 - [ ] Docker y Docker Compose instalados
 - [ ] Variables de entorno configuradas (`app/.env`)
@@ -772,7 +766,7 @@ Este proyecto está bajo la licencia MIT. Ver `LICENSE` para más detalles.
 
 ---
 
-## 📞 Soporte
+## Soporte
 
 Problemas comunes:
 
@@ -788,7 +782,3 @@ Para más ayuda, revisa los logs:
 ```bash
 docker-compose logs -f
 ```
-
----
-
-**¡Gracias por usar Rock Samples API!** 🪨✨
