@@ -5,6 +5,7 @@ from src.db.main import get_session
 from http import HTTPStatus
 from .service import SampleService
 from .schemas import SampleCreateModel, SampleResponseModel
+from src.auth.auth import get_current_active_user
 
 samples_router = APIRouter(prefix="/samples")
 
@@ -25,7 +26,9 @@ async def read_sample(sample_id: str, session: AsyncSession = Depends(get_sessio
 
 @samples_router.post("/", status_code=HTTPStatus.CREATED)
 async def create_sample(
-    sample_create_data: SampleCreateModel, session: AsyncSession = Depends(get_session)
+    sample_create_data: SampleCreateModel, 
+    session: AsyncSession = Depends(get_session),
+    current_user: dict = Depends(get_current_active_user)
 ):
     """Creates a new sample"""
     new_sample = await SampleService(session).create_sample(sample_create_data)
@@ -39,6 +42,7 @@ async def update_sample(
     sample_id: str,
     update_data: SampleCreateModel,
     session: AsyncSession = Depends(get_session),
+    current_user: dict = Depends(get_current_active_user)
 ):
     """Updates a sample"""
     updated_sample = await SampleService(session).update_sample(sample_id, update_data)
@@ -46,7 +50,11 @@ async def update_sample(
     return updated_sample
 
 @samples_router.delete("/{sample_id}", status_code=HTTPStatus.NO_CONTENT)
-async def delete_sample(sample_id: str, session: AsyncSession = Depends(get_session)):
+async def delete_sample(
+    sample_id: str, 
+    session: AsyncSession = Depends(get_session),
+    current_user: dict = Depends(get_current_active_user)
+    ):
     """Deletes a sample"""
     await SampleService(session).delete_sample(sample_id)
     return {}

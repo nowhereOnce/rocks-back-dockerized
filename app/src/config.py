@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     This class defines the settings for the app
     """
     POSTGRES_URL: str
+    SECRET_KEY: str = "your-secret-key-here"
+    ALGORITHM: str = "HS256"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

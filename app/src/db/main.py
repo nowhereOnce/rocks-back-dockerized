@@ -17,7 +17,6 @@ async def init_db():
         await conn.run_sync(SQLModel.metadata.create_all)
 
 # get_session: Function that provides asynchronous database sessions that can be used to perform operations on the database.
-@asynccontextmanager
 async def get_session() -> AsyncSession:
     """Dependency to provide the session object"""
     async_session = sessionmaker(

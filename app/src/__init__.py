@@ -4,6 +4,7 @@ from src.db.main import init_db
 from src.rocks.routes import rocks_router
 from src.locations.routes import locations_router
 from src.samples.routes import samples_router
+from src.auth.auth import auth_router
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -31,6 +32,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth_router, tags=["auth"])
 app.include_router(rocks_router, tags=["rocks"])
 app.include_router(locations_router, tags=["locations"])
 app.include_router(samples_router, tags=["samples"])
