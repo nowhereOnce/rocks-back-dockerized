@@ -3,6 +3,7 @@ from sqlmodel import text, SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.orm import sessionmaker
 from src.config import settings
+from contextlib import asynccontextmanager
 
 # async_engine: Asynchronous database engine that allows performing operations in PostgreSQL.
 async_engine = create_async_engine(url=settings.POSTGRES_URL, echo=True)
@@ -16,6 +17,7 @@ async def init_db():
         await conn.run_sync(SQLModel.metadata.create_all)
 
 # get_session: Function that provides asynchronous database sessions that can be used to perform operations on the database.
+@asynccontextmanager
 async def get_session() -> AsyncSession:
     """Dependency to provide the session object"""
     async_session = sessionmaker(

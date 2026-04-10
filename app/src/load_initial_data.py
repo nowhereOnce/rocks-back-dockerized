@@ -13,7 +13,7 @@ async def create_initial_data():
     async with get_session() as session:
         sample_service = SampleService(session)
 
-        with open('app/src/datos_rocas.csv', newline='', encoding='utf-8') as csvfile:
+        with open('src/datos_rocas.csv', newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 sample_data = SampleCreateModel(
