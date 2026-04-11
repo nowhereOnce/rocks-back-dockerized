@@ -9,18 +9,16 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sqlmodel import select
 from src.db.main import AsyncSessionLocal, init_db
 from src.db.models import User, Samples
-from src.auth import get_password_hash
+from src.auth.service import AuthService
 from src.config import settings
 from src.samples.schemas import SampleCreateModel
 from src.samples.service import SampleService
 
 async def create_admin_user(session):
     """
-    Creates a default administrator user if it does not already exist.
-
-    Args:
-        session (AsyncSession): The database session to use for creation.
+    Creates the default admin user if it does not already exist in the database.
     """
+    auth_service = AuthService(session)
     statement = select(User).where(User.username == settings.ADMIN_USERNAME)
     result = await session.exec(statement)
     admin_user = result.first()
@@ -30,7 +28,7 @@ async def create_admin_user(session):
         new_admin = User(
             username=settings.ADMIN_USERNAME,
             email=settings.ADMIN_EMAIL,
-            hashed_password=get_password_hash(settings.ADMIN_PASSWORD),
+            hashed_password=auth_service.get_password_hash(settings.ADMIN_PASSWORD),
             first_name="Admin",
             last_name="User",
             is_active=True
@@ -42,10 +40,8 @@ async def create_admin_user(session):
 
 async def create_initial_data():
     """
-    Initializes the database and loads seed data.
-    
-    This includes creating the database tables, adding a default administrator,
-    and importing initial samples from a CSV file if the samples table is empty.
+    Initializes the database and populates it with an admin user 
+    and initial sample data from a CSV file.
     """
     await init_db()
     async with AsyncSessionLocal() as session:

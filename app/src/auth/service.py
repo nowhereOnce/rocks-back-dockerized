@@ -20,53 +20,63 @@ ALGORITHM = settings.ALGORITHM
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
-def verify_password(plain_password, hashed_password):
-    """Verifies a plain text password against a hashed password."""
-    try:
-        return pwd_context.verify(plain_password, hashed_password)
-    except Exception:
-        return False
-
-def get_password_hash(password):
-    """Generates a bcrypt hash of the given password."""
-    return pwd_context.hash(password)
-
-async def get_user_by_username(session: AsyncSession, username: str):
-    """Retrieves a user from the database by their username."""
-    statement = select(User).where(User.username == username)
-    result = await session.execute(statement)
-    return result.scalar_one_or_none()
-
-async def authenticate_user(session: AsyncSession, username: str, password: str):
+class AuthService:
     """
-    Authenticates a user by checking their username and password.
-    Returns the user object if successful, False otherwise.
+    Service class handling authentication, password hashing, 
+    and JWT token operations.
     """
-    user = await get_user_by_username(session, username)
-    if not user:
-        return False
-    if not verify_password(password, user.hashed_password):
-        return False
-    return user
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
-    """
-    Creates a JWT access token with an optional expiration time.
-    The 'sub' (subject) in data typically contains the username.
-    """
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    def __init__(self, session: AsyncSession):
+        """Initializes the service with a database session."""
+        self.session = session
+
+    def verify_password(self, plain_password: str, hashed_password: str) -> bool:
+        """Verifies a plain text password against a hashed password."""
+        try:
+            return pwd_context.verify(plain_password, hashed_password)
+        except Exception:
+            return False
+
+    def get_password_hash(self, password: str) -> str:
+        """Generates a bcrypt hash of the given password."""
+        return pwd_context.hash(password)
+
+    async def get_user_by_username(self, username: str) -> User | None:
+        """Retrieves a user from the database by their username."""
+        statement = select(User).where(User.username == username)
+        result = await self.session.execute(statement)
+        return result.scalar_one_or_none()
+
+    async def authenticate_user(self, username: str, password: str) -> User | bool:
+        """
+        Authenticates a user by checking their username and password.
+        Returns the user object if successful, False otherwise.
+        """
+        user = await self.get_user_by_username(username)
+        if not user:
+            return False
+        if not self.verify_password(password, user.hashed_password):
+            return False
+        return user
+
+    def create_access_token(self, data: dict, expires_delta: timedelta | None = None) -> str:
+        """
+        Creates a JWT access token with an optional expiration time.
+        The 'sub' (subject) in data typically contains the username.
+        """
+        to_encode = data.copy()
+        if expires_delta:
+            expire = datetime.now(timezone.utc) + expires_delta
+        else:
+            expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+        to_encode.update({"exp": expire})
+        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+        return encoded_jwt
 
 async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
     session: AsyncSession = Depends(get_session)
-):
+) -> User:
     """
     Dependency that retrieves the current authenticated user from the JWT token.
     Raises 401 Unauthorized if the token is invalid or the user doesn't exist.
@@ -85,14 +95,15 @@ async def get_current_user(
     except InvalidTokenError:
         raise credentials_exception
     
-    user = await get_user_by_username(session, username=token_data.username)
+    auth_service = AuthService(session)
+    user = await auth_service.get_user_by_username(username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
 
 async def get_current_active_user(
     current_user: Annotated[User, Depends(get_current_user)],
-):
+) -> User:
     """
     Dependency that checks if the current user is active.
     Raises 400 Bad Request if the user is inactive.
