@@ -16,7 +16,7 @@ from .service import (
     get_current_active_user
 )
 
-# Constantes (podrían estar en config si se prefiere)
+# Constants
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
 
 auth_router = APIRouter(prefix="/auth")
@@ -26,6 +26,10 @@ async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: AsyncSession = Depends(get_session)
 ) -> Token:
+    """
+    OAuth2 compatible token login, get an access token for future requests.
+    Expects username and password in form data.
+    """
     user = await authenticate_user(session, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -44,6 +48,10 @@ async def create_user(
     user_data: UserCreate,
     session: AsyncSession = Depends(get_session)
 ):
+    """
+    Registers a new user in the system.
+    Checks if the username is already taken before creating the user.
+    """
     # Check if user already exists
     existing_user = await get_user_by_username(session, user_data.username)
     if existing_user:
@@ -65,4 +73,7 @@ async def create_user(
 async def read_users_me(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
+    """
+    Returns the current authenticated user's profile information.
+    """
     return current_user

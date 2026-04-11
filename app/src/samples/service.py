@@ -7,18 +7,24 @@ from sqlalchemy import and_
 
 class SampleService:
     """
-    This class provides theh methods to create, read, update and delete a sample
+    Service class for managing sample-related database operations.
     """
 
     def __init__(self, session: AsyncSession):
+        """
+        Initializes the SampleService with a database session.
+
+        Args:
+            session (AsyncSession): The asynchronous database session.
+        """
         self.session = session
 
     async def get_all_samples(self):
         """
-        Gets a list with all the samples
+        Retrieves all samples from the database with associated rock and location details.
 
         Returns:
-            list: list of samples
+            List[SampleResponseModel]: A list of samples formatted for response.
         """
         statement = select(Samples, Rocks, Locations).join(Samples.rock).join(Samples.location).order_by(Samples.created_at)
         result = await self.session.exec(statement)
@@ -36,13 +42,14 @@ class SampleService:
             ) for sample, _, _ in result]
 
     async def get_sample(self, sample_uid: str):
-        """Gets a sample by its UUID.
+        """
+        Retrieves a single sample by its unique identifier.
 
         Args:
-            sample_uid (str): sample's UUID
+            sample_uid (str): The UUID of the sample.
 
         Returns:
-            Samples: sample object
+            Optional[Samples]: The sample object if found, otherwise None.
         """
         statement = select(Samples).where(Samples.uid == sample_uid)
         result = await self.session.exec(statement)
@@ -100,13 +107,13 @@ class SampleService:
 
     async def create_sample(self, sample_create_data: SampleCreateModel):
         """
-        Creates a new sample in the database.
+        Creates and persists a new sample in the database, ensuring associated rock and location exist.
 
         Args:
-            sample_create_data (SampleCreateModel): The data to create a new sample.
+            sample_create_data (SampleCreateModel): Data for the new sample.
 
         Returns:
-            Samples: The newly created sample object.
+            Samples: The newly created and persisted sample object.
         """
         rock = await self.get_or_create_rock(
             sample_create_data.rock_name, sample_create_data.description
@@ -130,14 +137,15 @@ class SampleService:
         return new_sample
 
     async def update_sample(self, sample_uid: str, sample_update_data: SampleCreateModel):
-        """Updates a sample
+        """
+        Updates an existing sample's information.
 
         Args:
-            sample_uid (str): sample's UUID
-            sample_update_data (SampleCreateModel): data to update the sample
+            sample_uid (str): The UUID of the sample to update.
+            sample_update_data (SampleCreateModel): The updated data.
 
         Returns:
-            Samples: updated sample
+            Optional[Samples]: The updated sample object.
         """
 
         statement = select(Samples).where(Samples.uid == sample_uid)
@@ -162,11 +170,12 @@ class SampleService:
         await self.session.commit()
         return sample
 
-    async def delete_sample(self, sample_uid):
-        """Deletes a sample
+    async def delete_sample(self, sample_uid: str):
+        """
+        Removes a sample from the database.
 
         Args:
-            sample_uid (str): sample's UUID
+            sample_uid (str): The UUID of the sample to delete.
         """
         statement = select(Samples).where(Samples.uid == sample_uid)
         result = await self.session.exec(statement)

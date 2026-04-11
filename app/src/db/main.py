@@ -15,7 +15,12 @@ AsyncSessionLocal = sessionmaker(
 
 # init_db: Function responsible for creating the tables in the database using the model definitions.
 async def init_db():
-    """Creates the database tables"""
+    """
+    Initializes the database by creating all defined tables.
+    
+    This function uses SQLModel's metadata to create tables if they do not exist.
+    It imports the models internally to ensure they are registered before creation.
+    """
     async with async_engine.begin() as conn:
         from .models import Rocks, Locations, Samples, User
 
@@ -23,6 +28,11 @@ async def init_db():
 
 # get_session: Function that provides asynchronous database sessions that can be used to perform operations on the database.
 async def get_session() -> AsyncSession:
-    """Dependency to provide the session object"""
+    """
+    Dependency function that provides an asynchronous database session.
+    
+    Yields:
+        AsyncSession: An asynchronous database session.
+    """
     async with AsyncSessionLocal() as session:
         yield session

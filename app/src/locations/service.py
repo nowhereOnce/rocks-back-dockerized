@@ -6,18 +6,24 @@ from sqlmodel import select
 
 class LocationService:
     """
-    This class provides the methods to create, read, update and delete a location
+    Service class for managing location-related database operations.
     """
 
     def __init__(self, session: AsyncSession):
+        """
+        Initializes the LocationService with a database session.
+
+        Args:
+            session (AsyncSession): The asynchronous database session.
+        """
         self.session = session
 
     async def get_all_locations(self):
         """
-        Gets a list with all the locations
+        Retrieves all locations from the database, ordered by creation date.
 
         Returns:
-            list: list of locations
+            List[Locations]: A list of location objects.
         """
         statement = select(Locations).order_by(Locations.created_at)
         result = await self.session.exec(statement)
@@ -25,13 +31,13 @@ class LocationService:
 
     async def create_location(self, location_create_data: LocationCreateModel):
         """
-        Creates a new location in the database
+        Creates and persists a new location in the database.
 
         Args:
-            location_create_data (LocationCreateModel): data to create a new location
+            location_create_data (LocationCreateModel): Data for the new location.
 
         Returns:
-            Location: a new location
+            Locations: The newly created and persisted location object.
         """
         new_location = Locations(**location_create_data.model_dump())
         self.session.add(new_location)
@@ -39,27 +45,29 @@ class LocationService:
         return new_location
 
     async def get_location(self, location_uid: str):
-        """Gets a location by its UUID.
+        """
+        Retrieves a single location by its unique identifier.
 
         Args:
-            location_uid (str): location's UUID
+            location_uid (str): The UUID of the location.
 
         Returns:
-            Locations: an location object
+            Optional[Locations]: The location object if found, otherwise None.
         """
         statement = select(Locations).where(Locations.uid == location_uid)
         result = await self.session.exec(statement)
         return result.first()
 
     async def update_location(self, location_uid: str, location_update_data: LocationCreateModel):
-        """Updates a location
+        """
+        Updates an existing location's information.
 
         Args:
-            location_uid (str): location's UIID
-            location_update_data (LocationCreateModel): data to update the location
+            location_uid (str): The UUID of the location to update.
+            location_update_data (LocationCreateModel): The updated data.
 
         Returns:
-            Locations: updated location
+            Optional[Locations]: The updated location object.
         """
 
         statement = select(Locations).where(Locations.uid == location_uid)
@@ -70,11 +78,12 @@ class LocationService:
         await self.session.commit()
         return location
 
-    async def delete_location(self, location_uid):
-        """Deletes a location
+    async def delete_location(self, location_uid: str):
+        """
+        Removes a location from the database.
 
         Args:
-            location_uid (str): location's UIID
+            location_uid (str): The UUID of the location to delete.
         """
         statement = select(Locations).where(Locations.uid == location_uid)
         result = await self.session.exec(statement)

@@ -21,20 +21,27 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 def verify_password(plain_password, hashed_password):
+    """Verifies a plain text password against a hashed password."""
     try:
         return pwd_context.verify(plain_password, hashed_password)
     except Exception:
         return False
 
 def get_password_hash(password):
+    """Generates a bcrypt hash of the given password."""
     return pwd_context.hash(password)
 
 async def get_user_by_username(session: AsyncSession, username: str):
+    """Retrieves a user from the database by their username."""
     statement = select(User).where(User.username == username)
     result = await session.execute(statement)
     return result.scalar_one_or_none()
 
 async def authenticate_user(session: AsyncSession, username: str, password: str):
+    """
+    Authenticates a user by checking their username and password.
+    Returns the user object if successful, False otherwise.
+    """
     user = await get_user_by_username(session, username)
     if not user:
         return False
@@ -43,6 +50,10 @@ async def authenticate_user(session: AsyncSession, username: str, password: str)
     return user
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    """
+    Creates a JWT access token with an optional expiration time.
+    The 'sub' (subject) in data typically contains the username.
+    """
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -56,6 +67,10 @@ async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
     session: AsyncSession = Depends(get_session)
 ):
+    """
+    Dependency that retrieves the current authenticated user from the JWT token.
+    Raises 401 Unauthorized if the token is invalid or the user doesn't exist.
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -78,6 +93,10 @@ async def get_current_user(
 async def get_current_active_user(
     current_user: Annotated[User, Depends(get_current_user)],
 ):
+    """
+    Dependency that checks if the current user is active.
+    Raises 400 Bad Request if the user is inactive.
+    """
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user

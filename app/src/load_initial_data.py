@@ -15,6 +15,12 @@ from src.samples.schemas import SampleCreateModel
 from src.samples.service import SampleService
 
 async def create_admin_user(session):
+    """
+    Creates a default administrator user if it does not already exist.
+
+    Args:
+        session (AsyncSession): The database session to use for creation.
+    """
     statement = select(User).where(User.username == settings.ADMIN_USERNAME)
     result = await session.exec(statement)
     admin_user = result.first()
@@ -35,6 +41,12 @@ async def create_admin_user(session):
         print(f"Admin user '{settings.ADMIN_USERNAME}' already exists.")
 
 async def create_initial_data():
+    """
+    Initializes the database and loads seed data.
+    
+    This includes creating the database tables, adding a default administrator,
+    and importing initial samples from a CSV file if the samples table is empty.
+    """
     await init_db()
     async with AsyncSessionLocal() as session:
         # Create admin user
