@@ -6,6 +6,20 @@ from typing import Optional, List
 
 #Table Models
 
+class User(SQLModel, table=True):
+    """
+    This class represents a user in the database
+    """
+    uid: UUID = Field(default_factory=uuid4, primary_key=True)
+    username: str = Field(unique=True, index=True)
+    email: str = Field(unique=True, index=True)
+    first_name: str
+    last_name: str
+    is_active: bool = Field(default=True)
+    hashed_password: str
+    created_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now))
+    updated_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now))
+
 class Rocks(SQLModel, table=True):
     """
     This class represents a rock in the database
@@ -48,6 +62,6 @@ class Samples(SQLModel, table=True):
     
     # Relationship with Rocks
     rock: Optional[Rocks] = Relationship(back_populates="samples")
-    
+
     # Relationship with Locations
     location: Optional[Locations] = Relationship(back_populates="samples")
