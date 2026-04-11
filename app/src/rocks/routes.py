@@ -5,7 +5,7 @@ from src.db.main import get_session
 from http import HTTPStatus
 from .service import RockService
 from .schemas import RockCreateModel, RockResponseModel
-from src.auth.auth import get_current_active_user
+from src.auth import get_current_active_user
 
 rocks_router = APIRouter(prefix="/rocks")
 

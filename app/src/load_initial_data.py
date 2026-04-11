@@ -9,7 +9,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sqlmodel import select
 from src.db.main import AsyncSessionLocal, init_db
 from src.db.models import User, Samples
-from src.auth.auth import get_password_hash
+from src.auth import get_password_hash
 from src.config import settings
 from src.samples.schemas import SampleCreateModel
 from src.samples.service import SampleService

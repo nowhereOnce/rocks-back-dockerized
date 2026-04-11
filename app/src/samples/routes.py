@@ -5,7 +5,7 @@ from src.db.main import get_session
 from http import HTTPStatus
 from .service import SampleService
 from .schemas import SampleCreateModel, SampleResponseModel
-from src.auth.auth import get_current_active_user
+from src.auth import get_current_active_user
 
 samples_router = APIRouter(prefix="/samples")
 
@@ -17,7 +17,7 @@ async def read_samples(session: AsyncSession = Depends(get_session)):
     samples = await SampleService(session).get_all_samples()
     return samples
 
-# Modify for cases where the id is: not found / incorrect length (37 characters)
+# modify for cases where the id is: not found / incorrect length (37 characters)
 @samples_router.get("/{sample_id}", status_code=HTTPStatus.OK)
 async def read_sample(sample_id: str, session: AsyncSession = Depends(get_session)):
     """Gets a sample by its UUID"""

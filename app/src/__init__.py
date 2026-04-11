@@ -4,7 +4,7 @@ from src.db.main import init_db
 from src.rocks.routes import rocks_router
 from src.locations.routes import locations_router
 from src.samples.routes import samples_router
-from src.auth.auth import auth_router
+from src.auth import auth_router
 from fastapi.middleware.cors import CORSMiddleware
 
 
