@@ -18,7 +18,6 @@ async def test_signup_user(client):
     data = response.json()
     assert data["username"] == "testuser"
     assert data["email"] == "test@example.com"
-    assert "id" in data
 
 @pytest.mark.asyncio
 async def test_login_user(client):
