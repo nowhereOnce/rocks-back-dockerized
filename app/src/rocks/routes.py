@@ -5,6 +5,7 @@ from src.db.main import get_session
 from http import HTTPStatus
 from .service import RockService
 from .schemas import RockCreateModel, RockResponseModel
+from src.auth import get_current_active_user
 
 rocks_router = APIRouter(prefix="/rocks")
 
@@ -25,7 +26,9 @@ async def read_rock(rock_id: str, session: AsyncSession = Depends(get_session)):
 
 @rocks_router.post("/", status_code=HTTPStatus.CREATED)
 async def create_rock(
-    rock_create_data: RockCreateModel, session: AsyncSession = Depends(get_session)
+    rock_create_data: RockCreateModel, 
+    session: AsyncSession = Depends(get_session),
+    current_user: dict = Depends(get_current_active_user)
 ):
     """Creates a new rock"""
     new_rock = await RockService(session).create_rock(rock_create_data)
@@ -39,6 +42,7 @@ async def update_rock(
     rock_id: str,
     update_data: RockCreateModel,
     session: AsyncSession = Depends(get_session),
+    current_user: dict = Depends(get_current_active_user)
 ):
     """Updates a rock"""
     updated_rock = await RockService(session).update_rock(rock_id, update_data)
@@ -46,7 +50,11 @@ async def update_rock(
     return updated_rock
 
 @rocks_router.delete("/{rock_id}", status_code=HTTPStatus.NO_CONTENT)
-async def delete_rock(rock_id: str, session: AsyncSession = Depends(get_session)):
+async def delete_rock(
+    rock_id: str, 
+    session: AsyncSession = Depends(get_session),
+    current_user: dict = Depends(get_current_active_user)
+    ):
     """Deletes a rock"""
     await RockService(session).delete_rock(rock_id)
     return {}
