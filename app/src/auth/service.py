@@ -44,8 +44,8 @@ class AuthService:
     async def get_user_by_username(self, username: str) -> User | None:
         """Retrieves a user from the database by their username."""
         statement = select(User).where(User.username == username)
-        result = await self.session.execute(statement)
-        return result.scalar_one_or_none()
+        result = await self.session.exec(statement)
+        return result.first()
 
     async def authenticate_user(self, username: str, password: str) -> User | bool:
         """
